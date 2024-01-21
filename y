@@ -1,2 +1,2 @@
 clear
-bash <(curl -L https://gitee.com/theqingyao/white-fox-script-faq-white/raw/master/Y/QSignYS.sh)
+bash <(curl -L https://github.com/yusheng929/white-fox-script-faq-white/tree/main/Y/QSignYS.sh)

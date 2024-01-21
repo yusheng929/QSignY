@@ -14,7 +14,7 @@
 
 
 ``` bash
-bash <(curl -L https://gitee.com/theqingyao/white-fox-script-faq-white/raw/master/Y/QSignY.sh)
+bash <(curl -L https://github.com/yusheng929/white-fox-script-faq-white/tree/main/Y/QSignY.sh)
 ```
 
 ### 注: Windows自求多福吧，这个Windows用不了，不是我不写，家里没电脑，不会写Windows的捏，可以去看看Windows一键包
