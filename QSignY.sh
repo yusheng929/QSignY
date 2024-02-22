@@ -224,4 +224,4 @@ cd /home/QSignY
 
     # 运行脚本
     ./QSign.sh
-    rm -rf /home/QSignY.sh
+    rm -rf /home/QSignY/QSignY.sh

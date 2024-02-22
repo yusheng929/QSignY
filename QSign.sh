@@ -3,7 +3,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-QSVersion=1.1.0
+QSVersion=1.2.0
 
 LANG=en_US.UTF-8
 
@@ -29,7 +29,9 @@ if [ -z "$1" ]; then
 	echo "6. 查看签名服务状态"
 	echo "7. 打开 qsign 日志"
 	echo "8. 修改签名端口"
+	echo "9. 修改签名密钥"
 	echo "当前脚本版本:$QSVersion"
+	echo "签名后端版本: 1.1.9"
 	echo "温馨提示，脚本快捷键为小写y，默认端口为7860，密钥为Y"
 	echo -n "请输入数字选项: "
 	
@@ -256,5 +258,27 @@ while true; do
         continue
     fi
     done
+    ;;
+9)
+echo "请输入密钥："
+read key
+
+while [[ -z "$key" ]]; do
+  echo "输入密钥错误，请重新输入："
+  read key
+done
+
+for folder in /home/QSignY/txlib/*; do
+  if [[ -d "$folder" ]]; then
+    config_file="$folder/config.json"
+    if [[ -f "$config_file" ]]; then
+      sed -i "s/\"key\": \".*\"/\"key\": \"$key\"/g" "$config_file"
+    fi
+  fi
+done
+
+echo "修改完成！"
+echo "当前密钥为: $key"
+
     ;;
 esac
