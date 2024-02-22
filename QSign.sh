@@ -3,7 +3,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-QSVersion=0.0.4
+QSVersion=1.0.0
 
 LANG=en_US.UTF-8
 
@@ -29,7 +29,7 @@ if [ -z "$1" ]; then
 	echo "6. 查看签名服务状态"
 	echo "7. 打开 qsign 日志"
 	echo "当前脚本版本:$QSVersion"
-	echo "温馨提示，默认端口为7860，密钥为Y"
+	echo "温馨提示，脚本快捷键为小写y，默认端口为7860，密钥为Y"
 	echo -n "请输入数字选项: "
 	
 	# shellcheck disable=SC2162
@@ -128,44 +128,51 @@ else
     sleep 2
     chmod +x /home/QSignY/app
     tmux new-session -d -s QSign -n "QSign" "cd /home/QSignY && ./app; sleep infinity"
+    exec /home/QSignY/QSign.sh
     fi
 	;;
 4)
 	while true; do
     # 提示用户输入版本信息
     echo "当前可用版本:"
+    version_count=1
     for dir in /home/QSignY/txlib/*; do
         if [ -d "$dir" ]; then
-            echo "$(basename $dir)"
+            echo "$version_count. $(basename $dir)"
+            ((version_count++))
         fi
     done
     
-    read -p "请输入版本信息: " version
+    read -p "请输入版本序号: " version_number
 
-    # 检查是否存在对应版本的文件夹
-    txlib_path="/home/QSignY/txlib"
-    if [ -d "$txlib_path/$version" ]; then
-    tmux kill-session -t QSign
-    echo -e "\033[1;36m修改成功\033[0m，\033[1;35m少女祈祷中...\033[0m"
+    # 检查用户输入的序号是否在范围内
+    total_versions=$(ls -l /home/QSignY/txlib/ | grep -c ^d)
+    if [ $version_number -ge 1 ] && [ $version_number -le $total_versions ]; then
+        # 获取用户选择的版本
+        version=$(ls /home/QSignY/txlib/ | sed -n ${version_number}p)
+        
+        tmux kill-session -t QSign
+        echo -e "\033[1;36m修改成功\033[0m，\033[1;35m少女祈祷中...\033[0m"
 
-    # 读取app文件内容并修改android_version字段
-    app_path="/home/QSignY/app"
-    sed -i "s/android_version=.*/android_version=$version/g" "$app_path"
+        # 读取app文件内容并修改android_version字段
+        app_path="/home/QSignY/app"
+        sed -i "s/android_version=.*/android_version=$version/g" "$app_path"
 
-    # 给app文件赋予可执行权限
-    chmod +x /home/QSignY/app
-    
-    sleep 3
-    clear
-  
-    exec /home/QSignY/QSign.sh
+        # 给app文件赋予可执行权限
+        chmod +x /home/QSignY/app
+        
+        sleep 3
+        clear
+      
+        exec /home/QSignY/QSign.sh
 
-    break
+        break
     else
-    echo "输入错误，请重新输入版本信息"
-    # 继续循环，提示用户重新输入版本信息
+        echo "输入错误，请重新输入版本序号"
+        # 继续循环，提示用户重新输入版本序号
     fi
-    done
+done
+
 	;;
 5)
     rm -rf /usr/local/bin/y
