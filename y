@@ -1,2 +1,2 @@
 clear
-bash /home/QSignYS.sh
+bash /home/QSignY/QSignYS.sh

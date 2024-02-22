@@ -3,7 +3,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-QSVersion=1.0.0
+QSVersion=1.1.0
 
 LANG=en_US.UTF-8
 
@@ -28,6 +28,7 @@ if [ -z "$1" ]; then
 	echo "5. 卸载 qsign 服务"
 	echo "6. 查看签名服务状态"
 	echo "7. 打开 qsign 日志"
+	echo "8. 修改签名端口"
 	echo "当前脚本版本:$QSVersion"
 	echo "温馨提示，脚本快捷键为小写y，默认端口为7860，密钥为Y"
 	echo -n "请输入数字选项: "
@@ -207,4 +208,53 @@ fi
 7)
 	tmux attach-session -t QSign
 	;;
+8)
+while true; do
+    read -p "请输入端口号：" port_input
+    
+    if [[ -z $port_input ]] || ! [[ $port_input =~ ^[0-9]+$ ]] || ((port_input < 0)) || ((port_input > 65536)); then
+        echo "输入错误，请重新输入"
+        continue
+    fi
+    
+    port=$port_input
+    
+    if ((port > 65535)); then
+        echo "当前输入端口超出范围，请输入1024-65535之间的端口号"
+        continue
+    fi
+    
+    if ((port >= 0 && port <= 1023)); then
+        echo "当前输入端口为系统端口，可能会导致签名无法正常运行，是否要设置为$port？"
+        read -p "Y/N: " confirm
+        
+        if [[ $confirm == "Y" || $confirm == "y" ]]; then
+            app_file="/home/QSignY/app"
+            sed -i 's/\(URL="http:\/\/127\.0\.0\.1:\)[0-9]*\(\/sign"\)/\1'"$port"'\2/' $app_file
+            
+            for config_file in /home/QSignY/txlib/*/config.json; do
+                sed -i 's/\("port":[[:space:]]*\)[0-9]*/\1'"$port"'/' $config_file
+            done
+            echo "修改成功"
+            
+            break
+        fi
+        
+    elif ((port >= 1024 && port <= 65535)); then
+        app_file="/home/QSignY/app"
+        sed -i 's/\(URL="http:\/\/127\.0\.0\.1:\)[0-9]*\(\/sign"\)/\1'"$port"'\2/' $app_file
+        
+        for config_file in /home/QSignY/txlib/*/config.json; do
+            sed -i 's/\("port":[[:space:]]*\)[0-9]*/\1'"$port"'/' $config_file
+        done
+        echo "修改成功"
+        
+        break
+    
+    else
+        echo "已取消"
+        continue
+    fi
+    done
+    ;;
 esac
